@@ -89,6 +89,8 @@ Connection.prototype.findOneBy = function (criteria, table, callback)
 };
 
 /**
+ * todo: change API to (object, table, callback) to be more similar to other methods
+ *
  * @param {String} table
  * @param {Object} object
  * @param {Function} callback(err, object)
@@ -116,6 +118,7 @@ Connection.prototype.insertObject = function (table, object, callback)
 
 /**
  * todo: user criteria instead of id
+ * todo: change API to (criteria, object, table, callback) to be more similar to other methods
  *
  * @param {Number} id
  * @param {String} table

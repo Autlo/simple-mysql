@@ -1,5 +1,8 @@
 # simple-mysql
-Wrapper for node-mysql to simplify common queries and enable connection to multiple databases.
+Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common queries and enable connection to multiple databases.
+
+> This module is currently in development and it's API **WILL** change before version 1.0.0
+> You have been warned!
 
 ## Table of Contents
 
@@ -52,6 +55,8 @@ connection.find(23, function (err, object) {
 });
 ```
 
+---
+
 ### findBy(criteria, table, callback)
 
 Finds rows from database where key is equal to value from `table`. Uses AND condition with multiple criteria 
@@ -72,33 +77,49 @@ connection.findBy({name: 'John', age: 23}, function (err, rows) {
 });
 ```
 
+---
+
 ### findAll(criteria, table, callback)
 
 TODO
+
+---
 
 ### findOneBy(criteria, table, callback)
 
 TODO
 
+---
+
 ### insertObject(table, object, callback)
 
 TODO
+
+---
 
 ### updateObject(id, table, object, callback)
 
 TODO
 
+---
+
 ### delete(id, table, object)
 
 TODO
+
+---
 
 ### deleteBy(value, field, table, callback)
 
 TODO
 
+---
+
 ### query(sql, callback)
 
 TODO
+
+---
 
 ## Configuration options
 

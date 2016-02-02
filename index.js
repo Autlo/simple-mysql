@@ -1,5 +1,7 @@
 'use strict';
 
+// todo: move the contents to /src directory
+
 var Connection = require('./src/Connection');
 var connections = {};
 
