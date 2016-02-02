@@ -1,0 +1,37 @@
+{
+  "name": "simple-mysql",
+  "description": "Wrapper for node-mysql to simplify common queries and enable connection to multiple databases.",
+  "version": "0.0.1",
+  "author": "Rain Ramm <rain@autlo.com>",
+  "license": "MIT",
+  "repository": "autlo/simple-mysql",
+  "homepage": "http://autlo.com",
+  "main": "index.js",
+  "dependencies": {
+    "mysql": "2.10.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "istanbul": "0.4.2",
+    "mocha": "2.4.5",
+    "sinon": "^1.17.3"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "index.js",
+    "src/"
+  ],
+  "scripts": {
+    "test": "mocha --reporter spec --bail --check-leaks test/",
+    "test-ci": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --check-leaks test/",
+    "postversion": "git push && git push --tags"
+  },
+  "keywords": [
+    "database",
+    "mysql"
+  ]
+}
