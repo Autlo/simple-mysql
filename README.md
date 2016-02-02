@@ -22,6 +22,7 @@ Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common quer
   - [`deleteBy`](#deleteBy)
   - [`query`](#query)
 - [Configuration options](#configuration-options)
+- [Changelog](#changelog)
 
 ## Install
 
@@ -127,3 +128,7 @@ TODO
 ## Configuration options
 
 This module's connection accepts the same configuration options as [mysql](https://www.npmjs.com/package/mysql) module. Read more about [connection options](https://www.npmjs.com/package/mysql#connection-options) and [pool specific options](https://www.npmjs.com/package/mysql#pool-options).
+
+## Changelog
+
+Changelog is available under [GitHub releases section](https://github.com/Autlo/simple-mysql/releases).
