@@ -1,5 +1,6 @@
 'use strict';
 
+var moment = require('moment');
 var assert = require('chai').assert;
 var Connection = require('../src/Connection');
 var mysql = require('mysql');
@@ -351,31 +352,58 @@ describe('Connection', function () {
     describe('#_buildSelectQuery', function () {
 
         it('Should use correct comparison with string', function () {
-            assert.deepEqual(
+            assert.equal(
                 connection._buildSelectQuery({field: 'value'}, 'table'),
                 'SELECT * FROM `table` WHERE `field` LIKE \'value\''
             );
         });
 
         it('Should use correct comparison with integer', function () {
-            assert.deepEqual(
+            assert.equal(
                 connection._buildSelectQuery({field: 1}, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 1'
             );
         });
 
         it('Should use correct comparison with floating point number', function () {
-            assert.deepEqual(
+            assert.equal(
                 connection._buildSelectQuery({field: 4.3}, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 4.3'
             );
         });
 
         it('Should build correct SQL with multiple criteria', function () {
-            assert.deepEqual(
+            assert.equal(
                 connection._buildSelectQuery({field: 4.3, field2: 'demo', field3: 'field'}, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 4.3 AND `field2` LIKE \'demo\' AND `field3` LIKE \'field\''
             );
+        });
+
+        it('Should use IS NULL when criteria value is null', function () {
+            assert.equal(
+                connection._buildSelectQuery({field: 1, field2: null}, 'table'),
+                'SELECT * FROM `table` WHERE `field` = 1 AND `field2` IS NULL'
+            );
+        });
+
+    });
+
+    describe('#_sanitizeValue', function () {
+
+        it('Should escape strings', function () {
+            assert.equal(connection._sanitizeValue(';DELETE FROM test;'), '\';DELETE FROM test;\'');
+        });
+
+        it('Should correctly format a Moment object', function () {
+            var value = moment('02-02-2016 22:34', 'DD-MM-YYYY HH:mm');
+
+            assert.equal(connection._sanitizeValue(value), '\'2016-02-02 22:34:00\'');
+        });
+
+        it('Should stringify Object', function () {
+            var value = {test: 'demo'};
+
+            assert.equal(connection._sanitizeValue(value), '\'{\\"test\\":\\"demo\\"}\'');
         });
 
     });
