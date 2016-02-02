@@ -11,6 +11,8 @@ Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common quer
 
 - [Install](#install)
 - [Usage](#usage)
+  - [Connection to single database](#connection-to-single-database)
+  - [Connection to multiple databases](#connection-to-multiple-databases)
 - [Provided Functions](#provided-functions)
   - [`find`](#find)
   - [`findBy`](#findBy)
@@ -35,6 +37,12 @@ $ npm install simple-mysql --save
 
 ## Usage
 
+#### Connection to single database
+
+TODO
+
+#### Connection to multiple databases
+
 TODO
 
 ## Provided functions
@@ -43,13 +51,13 @@ TODO
 
 Finds row from database with the field id equal to `id` from `table`. 
 
-__Arguments__
+**Arguments**
 
 * `id` - ID of the row.
 * `table` - Name of table in database.
 * `callback(err, object)` - A callback which is called when database query finishes.
 
-__Examples__
+**Examples**
 
 ```js
 // assuming connections is a Connection object and connected to database
@@ -65,19 +73,20 @@ connection.find(23, function (err, object) {
 
 Finds rows from database where key is equal to value from `table`. Uses AND condition with multiple criteria 
 
-__Arguments__
+**Arguments**
 
 * `criteria` - Key-value pairs for where condition.
 * `table` - Name of table in database.
 * `callback(err, object)` - A callback which is called when database query finishes.
 
-__Examples__
+**Examples**
 
 ```js
 // assuming connections is a Connection object and connected to database
 connection.findBy({name: 'John', age: 23}, function (err, rows) {
     // err is equal to error from database if there were any
-    // rows is an array of objects equal to the row from database or an empty row when there where no results
+    // rows is an array of objects equal to the row from database or an 
+    // empty row when there where no results
 });
 ```
 
