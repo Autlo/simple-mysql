@@ -1,11 +1,11 @@
 [![Build Status](https://travis-ci.org/Autlo/simple-mysql.svg?branch=master)](https://travis-ci.org/Autlo/simple-mysql)
 [![Coverage Status](https://coveralls.io/repos/github/Autlo/simple-mysql/badge.svg?branch=master)](https://coveralls.io/github/Autlo/simple-mysql?branch=master)
 
+> This module is currently in development and it's API **WILL** change before version 1.0.0
+> **You have been warned!**
+
 # simple-mysql
 Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common queries and enable connection to multiple databases.
-
-> This module is currently in development and it's API **WILL** change before version 1.0.0
-> You have been warned!
 
 ## Table of Contents
 
