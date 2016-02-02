@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/Autlo/simple-mysql.svg?branch=master)](https://travis-ci.org/Autlo/simple-mysql)
+[![Coverage Status](https://coveralls.io/repos/github/Autlo/simple-mysql/badge.svg?branch=master)](https://coveralls.io/github/Autlo/simple-mysql?branch=master)
+
 # simple-mysql
 Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common queries and enable connection to multiple databases.
 
