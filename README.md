@@ -40,7 +40,39 @@ $ npm install simple-mysql --save
 
 #### Connection to single database
 
-TODO
+**Create a new connection**
+
+```js
+var mysql = require('simple-mysql');
+
+var connection = mysql.createConnection({
+    host: 'my-host',
+    user: 'my-user',
+    password: 'my-super-secret-pwd',
+    database: 'my-database'
+}, 'default');
+```
+
+**Retrieve the same connection in another file and make a simple database query**
+
+```js
+var mysql = require('simple-mysql');
+
+var connection = mysql.getConnection('default');
+
+connection.findAll('user', function (err, users) {
+    // err - error if one has occurred
+    // users - an array of all user objects in table user
+});
+```
+
+**Closing the connection**
+```js
+var mysql = require('simple-mysql');
+
+connection.closeConnection('default');
+```
+
 
 #### Connection to multiple databases
 

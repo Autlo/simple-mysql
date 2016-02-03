@@ -28,13 +28,21 @@ Connection.prototype.connect = function ()
 };
 
 /**
- * Reset lost connection
+ * Disconnect database
  */
-Connection.prototype.resetConnection = function ()
+Connection.prototype.disconnect = function ()
 {
     try {
         this.pool.end();
     } catch (e) {}
+};
+
+/**
+ * Reset lost connection
+ */
+Connection.prototype.resetConnection = function ()
+{
+    this.disconnect();
 
     this.connect();
 };
