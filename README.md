@@ -106,13 +106,13 @@ TODO
 
 ---
 
-### insertObject(table, object, callback)
+### insertObject(object, table, callback)
 
 TODO
 
 ---
 
-### updateObject(id, table, object, callback)
+### updateObject(criteria, object, table, callback)
 
 TODO
 
@@ -124,7 +124,7 @@ TODO
 
 ---
 
-### deleteBy(value, field, table, callback)
+### deleteBy(criteria, table, callback)
 
 TODO
 

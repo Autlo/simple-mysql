@@ -3,8 +3,7 @@
 var util = require('util');
 var mysql = require('mysql');
 var debug = require('debug')('simple-mysql');
-var stringify = require('json-stringify-safe');
-var dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
+var qb = require('./QueryBuilder');
 
 /**
  * @param {Object} config
@@ -58,17 +57,17 @@ Connection.prototype.find = function (id, table, callback)
  */
 Connection.prototype.findBy = function (criteria, orderBy, table, callback)
 {
-    this.query(this._buildSelectQuery(criteria, orderBy, table), callback);
+    this.query(qb.buildSelectQuery(criteria, orderBy, table), callback);
 };
 
 /**
- * @param {String} table
  * @param {Object} orderBy
+ * @param {String} table
  * @param {Function} callback
  */
 Connection.prototype.findAll = function (orderBy, table, callback)
 {
-    this.query(this._buildSelectQuery({}, orderBy, table), callback);
+    this.query(qb.buildSelectQuery({}, orderBy, table), callback);
 };
 
 /**
@@ -78,66 +77,34 @@ Connection.prototype.findAll = function (orderBy, table, callback)
  */
 Connection.prototype.findOneBy = function (criteria, table, callback)
 {
-    this.query(this._buildSelectQuery(criteria, {}, table), returnOneOrNull(callback));
+    this.query(qb.buildSelectQuery(criteria, {}, table), returnOneOrNull(callback));
 };
 
 /**
- * todo: change API to (object, table, callback) to be more similar to other methods
- *
- * @param {String} table
  * @param {Object} object
+ * @param {String} table
  * @param {Function} callback(err, object)
  */
-Connection.prototype.insertObject = function (table, object, callback)
+Connection.prototype.insertObject = function (object, table, callback)
 {
-    var sql = 'INSERT INTO ' + this._escapeField(table) + ' (`' + Object.keys(object).join('`, `') + '`) VALUES ';
-    var values = [];
-
-    for (var key in object) {
-        if (!object.hasOwnProperty(key)) continue;
-
-        values.push(this._sanitizeValue(object[key]));
-    }
-
-    sql += '(' + values.join(', ') + ')';
-
-    this.query(sql, function (err, result) {
+    this.query(qb.buildInsertQuery(object, table), function (err, result) {
         if (err) return callback(err, null);
 
         object.id = result.insertId;
+
         callback(err, object);
     });
 };
 
 /**
- * todo: user criteria instead of id
- * todo: change API to (criteria, object, table, callback) to be more similar to other methods
- *
- * @param {Number} id
- * @param {String} table
+ * @param {Object} criteria
  * @param {Object} object
+ * @param {String} table
  * @param {Function} callback(err)
  */
-Connection.prototype.updateObject = function (id, table, object, callback)
+Connection.prototype.updateObject = function (criteria, object, table, callback)
 {
-    var sql = 'UPDATE ' + this._escapeField(table) + ' SET ',
-        valueCount = 0;
-
-    for (var key in object) {
-        if (object.hasOwnProperty(key)) {
-            if (valueCount > 0) {
-                sql += ', ';
-            }
-
-            sql += this._escapeField(key) + ' = ' + this._sanitizeValue(object[key]);
-        }
-
-        valueCount++;
-    }
-
-    sql += ' WHERE ' + this._escapeField('id') + ' = ' + id;
-
-    this.query(sql, callback);
+    this.query(qb.buildUpdateQuery(criteria, object, table), callback);
 };
 
 /**
@@ -147,28 +114,17 @@ Connection.prototype.updateObject = function (id, table, object, callback)
  */
 Connection.prototype.delete = function (id, table, callback)
 {
-    this.deleteBy(id, 'id', table, callback);
+    this.deleteBy({id: id}, table, callback);
 };
 
 /**
- * todo: use criteria instead of id
- *
- * @param {String|Number} value
- * @param {String} field
+ * @param {Object} criteria
  * @param {String} table
  * @param {Function} callback(err)
  */
-Connection.prototype.deleteBy = function (value, field, table, callback)
+Connection.prototype.deleteBy = function (criteria, table, callback)
 {
-    var sql = util.format(
-        'DELETE FROM %s WHERE %s %s %s',
-        this._escapeField(table),
-        this._escapeField(field),
-        typeof value === 'number' ? '=' : 'LIKE',
-        this._sanitizeValue(value)
-    );
-
-    this.query(sql, callback);
+    this.query(qb.buildDeleteQuery(criteria, table), callback);
 };
 
 /**
@@ -184,116 +140,6 @@ Connection.prototype.query = function (sql, callback)
 
         callback(err, result);
     });
-};
-
-/**
- *
- * @param {Object} criteria
- * @param {Object} orderBy
- * @param {String} table
- * @returns {String}
- * @private
- */
-Connection.prototype._buildSelectQuery = function (criteria, orderBy, table)
-{
-    var sql = 'SELECT * FROM ' + this._escapeField(table);
-
-    // todo: move to separate method
-    if (Object.keys(criteria).length !== 0) {
-        var n = 0;
-
-        sql += ' WHERE ';
-
-        for (var key in criteria) {
-            if (!criteria.hasOwnProperty(key)) {
-                continue;
-            }
-
-            if (n !== 0) {
-                sql += ' AND ';
-            }
-
-            sql += this._escapeField(key);
-
-            var value = criteria[key];
-            if (value === null) {
-                sql += ' IS NULL';
-            } else if (typeof value === 'number') {
-                sql += ' = ' + value;
-            } else {
-                sql += ' LIKE ' + this._sanitizeValue(value);
-            }
-
-            n += 1;
-        }
-    }
-
-    // todo: move to separate method
-    if (Object.keys(orderBy).length !== 0) {
-        var i = 0;
-
-        sql += ' ORDER BY ';
-
-        for (var field in orderBy) {
-            if (!orderBy.hasOwnProperty(field)) {
-                continue;
-            }
-
-            if (i !== 0) {
-                sql += ', ';
-            }
-
-            sql += this._escapeField(field);
-
-            var order = orderBy[field];
-            var orderAdded = false;
-            if (order === 'desc' || order === 'DESC') {
-                sql += ' DESC';
-                orderAdded = true;
-            }
-
-            if (order === 'asc' || order === 'ASC') {
-                sql += ' ASC';
-                orderAdded = true;
-            }
-
-            if (!orderAdded) {
-                throw new Error('Order must be ASC or DESC');
-            }
-
-            i++;
-        }
-    }
-
-    return sql;
-};
-
-/**
- * @param value
- * @return {String}
- * @private
- */
-Connection.prototype._sanitizeValue = function (value)
-{
-    if (value !== null && typeof value === 'object' && value._isAMomentObject) {
-        value = value.format(dateTimeFormat);
-    }
-
-    if (value !== null && typeof value === 'object') {
-        value = stringify(value);
-    }
-
-    return this.pool.escape(value);
-};
-
-/**
- * @param {String} name
- * @returns {string}
- * @private
- */
-Connection.prototype._escapeField = function (name)
-{
-    return '`' + name + '`';
 };
 
 /**

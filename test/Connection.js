@@ -1,8 +1,8 @@
 'use strict';
 
-var moment = require('moment');
 var assert = require('chai').assert;
 var Connection = require('../src/Connection');
+var moment = require('moment');
 var mysql = require('mysql');
 var Pool = require('../node_modules/mysql/lib/Pool');
 var PoolConfig = require('../node_modules/mysql/lib/PoolConfig');
@@ -184,7 +184,7 @@ describe('Connection', function () {
 
     });
 
-    describe('#inserObject', function () {
+    describe('#insertObject', function () {
 
         it('Should compose correct SQL', function (done) {
             sinon.stub(Connection.prototype, 'query', function (sql, callback) {
@@ -193,7 +193,7 @@ describe('Connection', function () {
                 callback(null, {insertId: 1});
             });
 
-            connection.insertObject('demo', {lala: 1, test2: 'demo'}, function (err) {
+            connection.insertObject({lala: 1, test2: 'demo'}, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();
@@ -209,7 +209,7 @@ describe('Connection', function () {
                 callback(null, {insertId: 23543});
             });
 
-            connection.insertObject('demo', object, function (err, result) {
+            connection.insertObject(object, 'demo', function (err, result) {
                 assert.isNull(err);
 
                 object.id = 23543;
@@ -230,28 +230,14 @@ describe('Connection', function () {
 
     describe('#updateObject', function () {
 
-        it('Should compose correct SQL with one property', function (done) {
+        it('Should compose correct SQL', function (done) {
             sinon.stub(Connection.prototype, 'query', function (sql, callback) {
                 assert.equal(sql, 'UPDATE `demo` SET `lala` = 1 WHERE `id` = 1');
 
                 callback(null);
             });
 
-            connection.updateObject(1, 'demo', {lala: 1}, function (err) {
-                assert.isNull(err);
-
-                done();
-            });
-        });
-
-        it('Should compose correct SQL with multiple properties', function (done) {
-            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
-                assert.equal(sql, 'UPDATE `demo` SET `lala` = 1, `test2` = \'demo\' WHERE `id` = 1');
-
-                callback(null);
-            });
-
-            connection.updateObject(1, 'demo', {lala: 1, test2: 'demo'}, function (err) {
+            connection.updateObject({id: 1},  {lala: 1}, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();
@@ -299,7 +285,7 @@ describe('Connection', function () {
                 callback(null);
             });
 
-            connection.deleteBy('demo', 'demo', 'demo', function (err) {
+            connection.deleteBy({demo: 'demo'}, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();
@@ -345,106 +331,6 @@ describe('Connection', function () {
             Pool.prototype.query.restore();
 
             done();
-        });
-
-    });
-
-    describe('#_buildSelectQuery', function () {
-
-        it('Should return SELECT statement without WHERE condition when criteria is empty', function () {
-            assert.equal(
-                connection._buildSelectQuery({}, {}, 'table'),
-                'SELECT * FROM `table`'
-            );
-        });
-
-        it('Should use correct comparison with string', function () {
-            assert.equal(
-                connection._buildSelectQuery({field: 'value'}, {}, 'table'),
-                'SELECT * FROM `table` WHERE `field` LIKE \'value\''
-            );
-        });
-
-        it('Should use correct comparison with integer', function () {
-            assert.equal(
-                connection._buildSelectQuery({field: 1}, {}, 'table'),
-                'SELECT * FROM `table` WHERE `field` = 1'
-            );
-        });
-
-        it('Should use correct comparison with floating point number', function () {
-            assert.equal(
-                connection._buildSelectQuery({field: 4.3}, {}, 'table'),
-                'SELECT * FROM `table` WHERE `field` = 4.3'
-            );
-        });
-
-        it('Should build correct SQL with multiple criteria', function () {
-            assert.equal(
-                connection._buildSelectQuery({field: 4.3, field2: 'demo', field3: 'field'}, {}, 'table'),
-                'SELECT * FROM `table` WHERE `field` = 4.3 AND `field2` LIKE \'demo\' AND `field3` LIKE \'field\''
-            );
-        });
-
-        it('Should use IS NULL when criteria value is null', function () {
-            assert.equal(
-                connection._buildSelectQuery({field: 1, field2: null}, {}, 'table'),
-                'SELECT * FROM `table` WHERE `field` = 1 AND `field2` IS NULL'
-            );
-        });
-
-        it('Should add correct ORDER BY statement', function () {
-            assert.equal(
-                connection._buildSelectQuery({}, {field: 'DESC'}, 'table'),
-                'SELECT * FROM `table` ORDER BY `field` DESC'
-            );
-        });
-
-        it('Should add multiple ORDER BY statements', function () {
-            assert.equal(
-                connection._buildSelectQuery({}, {field: 'DESC', field2: 'ASC'}, 'table'),
-                'SELECT * FROM `table` ORDER BY `field` DESC, `field2` ASC'
-            );
-        });
-
-        it('Should accept lowercase order', function () {
-            assert.equal(
-                connection._buildSelectQuery({}, {field: 'desc', field2: 'asc'}, 'table'),
-                'SELECT * FROM `table` ORDER BY `field` DESC, `field2` ASC'
-            );
-        });
-
-        it('Should throw error if invalid order is provided', function () {
-            assert.throws(function () {
-                connection._buildSelectQuery({}, {field: 'order'}, 'table')
-            }, Error);
-        });
-
-    });
-
-    describe('#_sanitizeValue', function () {
-
-        it('Should escape strings', function () {
-            assert.equal(connection._sanitizeValue(';DELETE FROM test;'), '\';DELETE FROM test;\'');
-        });
-
-        it('Should correctly format a Moment object', function () {
-            var value = moment('02-02-2016 22:34', 'DD-MM-YYYY HH:mm');
-
-            assert.equal(connection._sanitizeValue(value), '\'2016-02-02 22:34:00\'');
-        });
-
-        it('Should stringify Object', function () {
-            var value = {test: 'demo'};
-
-            assert.equal(connection._sanitizeValue(value), '\'{\\"test\\":\\"demo\\"}\'');
-        });
-
-        it('Should stringify Object with circular reference', function () {
-            var value = {demo: 1};
-            value.circular = value;
-
-            assert.equal(connection._sanitizeValue(value), '\'{\\"demo\\":1,\\"circular\\":\\"[Circular ~]\\"}\'')
         });
 
     });
