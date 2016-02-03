@@ -1,7 +1,7 @@
 {
   "name": "simple-mysql",
   "description": "Wrapper for node-mysql to simplify common queries and enable connection to multiple databases.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Rain Ramm <rain@autlo.com>",
   "license": "MIT",
   "repository": "autlo/simple-mysql",
