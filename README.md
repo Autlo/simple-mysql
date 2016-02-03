@@ -24,6 +24,7 @@ Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common quer
   - [`deleteBy`](#deleteBy)
   - [`query`](#query)
 - [Configuration options](#configuration-options)
+- [Debugging](#debugging)
 - [Changelog](#changelog)
 
 ## Install
@@ -69,13 +70,14 @@ connection.find(23, function (err, object) {
 
 ---
 
-### findBy(criteria, table, callback)
+### findBy(criteria, orderBy, table, callback)
 
 Finds rows from database where key is equal to value from `table`. Uses AND condition with multiple criteria 
 
 **Arguments**
 
 * `criteria` - Key-value pairs for where condition.
+* `orderBy` - Key-value pairs for order by condition.
 * `table` - Name of table in database.
 * `callback(err, object)` - A callback which is called when database query finishes.
 
@@ -83,7 +85,7 @@ Finds rows from database where key is equal to value from `table`. Uses AND cond
 
 ```js
 // assuming connections is a Connection object and connected to database
-connection.findBy({name: 'John', age: 23}, function (err, rows) {
+connection.findBy({name: 'John', age: 23}, {age: 'DESC'}, function (err, rows) {
     // err is equal to error from database if there were any
     // rows is an array of objects equal to the row from database or an 
     // empty row when there where no results
@@ -92,13 +94,13 @@ connection.findBy({name: 'John', age: 23}, function (err, rows) {
 
 ---
 
-### findAll(criteria, table, callback)
+### findAll(criteria, orderBy, table, callback)
 
 TODO
 
 ---
 
-### findOneBy(criteria, table, callback)
+### findOneBy(criteria, orderBy, table, callback)
 
 TODO
 
@@ -137,6 +139,11 @@ TODO
 ## Configuration options
 
 This module's connection accepts the same configuration options as [mysql](https://www.npmjs.com/package/mysql) module. Read more about [connection options](https://www.npmjs.com/package/mysql#connection-options) and [pool specific options](https://www.npmjs.com/package/mysql#pool-options).
+
+## Debugging
+
+[Debug library](https://www.npmjs.com/package/debug) is used for debugging. To activate debugging for this library run
+your service with environment variable **DEBUG**. For example: `DEBUG:simple-mysql node service.js`.
 
 ## Changelog
 

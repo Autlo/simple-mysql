@@ -116,12 +116,12 @@ describe('Connection', function () {
 
         it('Should compose correct SQL', function (done) {
             sinon.stub(Connection.prototype, 'query', function (sql, callback) {
-                assert.equal(sql, 'SELECT * FROM `demo` WHERE `demo_field` LIKE \'test\'');
+                assert.equal(sql, 'SELECT * FROM `demo` WHERE `demo_field` LIKE \'test\' ORDER BY `field` DESC');
 
                 callback(null, []);
             });
 
-            connection.findBy({demo_field: 'test'}, 'demo', function (err) {
+            connection.findBy({demo_field: 'test'}, {field: 'desc'}, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();
@@ -140,12 +140,12 @@ describe('Connection', function () {
 
         it('Should compose correct SQL', function (done) {
             sinon.stub(Connection.prototype, 'query', function (sql, callback) {
-                assert.equal(sql, 'SELECT * FROM `demo`');
+                assert.equal(sql, 'SELECT * FROM `demo` ORDER BY `field` ASC');
 
                 callback(null, []);
             });
 
-            connection.findAll('demo', function (err) {
+            connection.findAll({field: 'asc'}, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();
@@ -351,39 +351,73 @@ describe('Connection', function () {
 
     describe('#_buildSelectQuery', function () {
 
+        it('Should return SELECT statement without WHERE condition when criteria is empty', function () {
+            assert.equal(
+                connection._buildSelectQuery({}, {}, 'table'),
+                'SELECT * FROM `table`'
+            );
+        });
+
         it('Should use correct comparison with string', function () {
             assert.equal(
-                connection._buildSelectQuery({field: 'value'}, 'table'),
+                connection._buildSelectQuery({field: 'value'}, {}, 'table'),
                 'SELECT * FROM `table` WHERE `field` LIKE \'value\''
             );
         });
 
         it('Should use correct comparison with integer', function () {
             assert.equal(
-                connection._buildSelectQuery({field: 1}, 'table'),
+                connection._buildSelectQuery({field: 1}, {}, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 1'
             );
         });
 
         it('Should use correct comparison with floating point number', function () {
             assert.equal(
-                connection._buildSelectQuery({field: 4.3}, 'table'),
+                connection._buildSelectQuery({field: 4.3}, {}, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 4.3'
             );
         });
 
         it('Should build correct SQL with multiple criteria', function () {
             assert.equal(
-                connection._buildSelectQuery({field: 4.3, field2: 'demo', field3: 'field'}, 'table'),
+                connection._buildSelectQuery({field: 4.3, field2: 'demo', field3: 'field'}, {}, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 4.3 AND `field2` LIKE \'demo\' AND `field3` LIKE \'field\''
             );
         });
 
         it('Should use IS NULL when criteria value is null', function () {
             assert.equal(
-                connection._buildSelectQuery({field: 1, field2: null}, 'table'),
+                connection._buildSelectQuery({field: 1, field2: null}, {}, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 1 AND `field2` IS NULL'
             );
+        });
+
+        it('Should add correct ORDER BY statement', function () {
+            assert.equal(
+                connection._buildSelectQuery({}, {field: 'DESC'}, 'table'),
+                'SELECT * FROM `table` ORDER BY `field` DESC'
+            );
+        });
+
+        it('Should add multiple ORDER BY statements', function () {
+            assert.equal(
+                connection._buildSelectQuery({}, {field: 'DESC', field2: 'ASC'}, 'table'),
+                'SELECT * FROM `table` ORDER BY `field` DESC, `field2` ASC'
+            );
+        });
+
+        it('Should accept lowercase order', function () {
+            assert.equal(
+                connection._buildSelectQuery({}, {field: 'desc', field2: 'asc'}, 'table'),
+                'SELECT * FROM `table` ORDER BY `field` DESC, `field2` ASC'
+            );
+        });
+
+        it('Should throw error if invalid order is provided', function () {
+            assert.throws(function () {
+                connection._buildSelectQuery({}, {field: 'order'}, 'table')
+            }, Error);
         });
 
     });
@@ -404,6 +438,27 @@ describe('Connection', function () {
             var value = {test: 'demo'};
 
             assert.equal(connection._sanitizeValue(value), '\'{\\"test\\":\\"demo\\"}\'');
+        });
+
+        it('Should stringify Object with circular reference', function () {
+            var value = {demo: 1};
+            value.circular = value;
+
+            assert.equal(connection._sanitizeValue(value), '\'{\\"demo\\":1,\\"circular\\":\\"[Circular ~]\\"}\'')
+        });
+
+    });
+
+    describe('#_onConnection', function () {
+
+        it('Should set connection timezone to UTC', function () {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SET time_zone = "+00:00";');
+
+                callback(null, []);
+            });
+
+            connection._onConnection(new Connection());
         });
 
     });

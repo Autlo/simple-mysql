@@ -2,6 +2,8 @@
 
 var util = require('util');
 var mysql = require('mysql');
+var debug = require('debug')('simple-mysql');
+var stringify = require('json-stringify-safe');
 var dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 
 /**
@@ -49,43 +51,34 @@ Connection.prototype.find = function (id, table, callback)
 };
 
 /**
- * todo: add optional order by argument like: {name: 'ASC'}
- *
  * @param {Object} criteria
+ * @param {Object} orderBy
  * @param {String} table
  * @param {Function} callback(err, object)
  */
-Connection.prototype.findBy = function (criteria, table, callback)
+Connection.prototype.findBy = function (criteria, orderBy, table, callback)
 {
-    this.query(this._buildSelectQuery(criteria, table), callback);
+    this.query(this._buildSelectQuery(criteria, orderBy, table), callback);
 };
 
 /**
- * todo: add optional order by argument like: {name: 'ASC'}
- *
  * @param {String} table
+ * @param {Object} orderBy
  * @param {Function} callback
  */
-Connection.prototype.findAll = function (table, callback)
+Connection.prototype.findAll = function (orderBy, table, callback)
 {
-    var sql = util.format(
-        'SELECT * FROM %s',
-        this._escapeField(table)
-    );
-
-    this.query(sql, callback);
+    this.query(this._buildSelectQuery({}, orderBy, table), callback);
 };
 
 /**
- * todo: add optional order by argument like: {name: 'ASC'}
- *
  * @param {Object} criteria
  * @param {String} table
  * @param {Function} callback(err, object)
  */
 Connection.prototype.findOneBy = function (criteria, table, callback)
 {
-    this.query(this._buildSelectQuery(criteria, table), returnOneOrNull(callback));
+    this.query(this._buildSelectQuery(criteria, {}, table), returnOneOrNull(callback));
 };
 
 /**
@@ -196,36 +189,80 @@ Connection.prototype.query = function (sql, callback)
 /**
  *
  * @param {Object} criteria
+ * @param {Object} orderBy
  * @param {String} table
  * @returns {String}
  * @private
  */
-Connection.prototype._buildSelectQuery = function (criteria, table)
+Connection.prototype._buildSelectQuery = function (criteria, orderBy, table)
 {
-    var sql = 'SELECT * FROM ' + this._escapeField(table) + ' WHERE ';
-    var n = 0;
+    var sql = 'SELECT * FROM ' + this._escapeField(table);
 
-    for (var key in criteria) {
-        if (!criteria.hasOwnProperty(key)) {
-            continue;
+    // todo: move to separate method
+    if (Object.keys(criteria).length !== 0) {
+        var n = 0;
+
+        sql += ' WHERE ';
+
+        for (var key in criteria) {
+            if (!criteria.hasOwnProperty(key)) {
+                continue;
+            }
+
+            if (n !== 0) {
+                sql += ' AND ';
+            }
+
+            sql += this._escapeField(key);
+
+            var value = criteria[key];
+            if (value === null) {
+                sql += ' IS NULL';
+            } else if (typeof value === 'number') {
+                sql += ' = ' + value;
+            } else {
+                sql += ' LIKE ' + this._sanitizeValue(value);
+            }
+
+            n += 1;
         }
+    }
 
-        if (n !== 0) {
-            sql += ' AND ';
+    // todo: move to separate method
+    if (Object.keys(orderBy).length !== 0) {
+        var i = 0;
+
+        sql += ' ORDER BY ';
+
+        for (var field in orderBy) {
+            if (!orderBy.hasOwnProperty(field)) {
+                continue;
+            }
+
+            if (i !== 0) {
+                sql += ', ';
+            }
+
+            sql += this._escapeField(field);
+
+            var order = orderBy[field];
+            var orderAdded = false;
+            if (order === 'desc' || order === 'DESC') {
+                sql += ' DESC';
+                orderAdded = true;
+            }
+
+            if (order === 'asc' || order === 'ASC') {
+                sql += ' ASC';
+                orderAdded = true;
+            }
+
+            if (!orderAdded) {
+                throw new Error('Order must be ASC or DESC');
+            }
+
+            i++;
         }
-
-        sql += this._escapeField(key);
-
-        var value = criteria[key];
-        if (value === null) {
-            sql += ' IS NULL';
-        } else if (typeof value === 'number') {
-            sql += ' = ' + value;
-        } else {
-            sql += ' LIKE ' + this._sanitizeValue(value);
-        }
-
-        n += 1;
     }
 
     return sql;
@@ -243,8 +280,7 @@ Connection.prototype._sanitizeValue = function (value)
     }
 
     if (value !== null && typeof value === 'object') {
-        // todo: use safe stringify
-        value = JSON.stringify(value);
+        value = stringify(value);
     }
 
     return this.pool.escape(value);
@@ -266,9 +302,11 @@ Connection.prototype._escapeField = function (name)
  */
 Connection.prototype._onConnection = function (connection)
 {
-    this._debug('Connection connected as id ' + connection.threadId + '.');
+    debug('Connection connected as id %s.', connection.threadId);
 
-    connection.query('SET time_zone = "+00:00"');
+    connection.query('SET time_zone = "+00:00";', function (err) {
+        if (err) throw err;
+    });
 };
 
 /**
@@ -293,20 +331,6 @@ Connection.prototype._onError = function (err)
             break;
         default:
             throw err;
-    }
-};
-
-/**
- * @param {String} msg
- * @private
- */
-Connection.prototype._debug = function (msg)
-{
-    // todo: fixme
-    return;
-
-    if (this.debug) {
-        util.log(util.format('[Debug][Connection][%s] %s', this.name, msg));
     }
 };
 

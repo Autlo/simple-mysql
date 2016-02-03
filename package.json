@@ -8,10 +8,12 @@
   "homepage": "http://autlo.com",
   "main": "index.js",
   "dependencies": {
-    "mysql": "2.10.2"
+    "json-stringify-safe": "^5.0.1",
+    "mysql": "^2.10.2"
   },
   "devDependencies": {
     "chai": "^3.4.0",
+    "debug": "^2.2.0",
     "istanbul": "0.4.2",
     "mocha": "2.4.5",
     "moment": "^2.11.1",
