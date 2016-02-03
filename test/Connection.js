@@ -184,7 +184,7 @@ describe('Connection', function () {
 
     });
 
-    describe('#insertObject', function () {
+    describe('#insert', function () {
 
         it('Should compose correct SQL', function (done) {
             sinon.stub(Connection.prototype, 'query', function (sql, callback) {
@@ -193,7 +193,7 @@ describe('Connection', function () {
                 callback(null, {insertId: 1});
             });
 
-            connection.insertObject({lala: 1, test2: 'demo'}, 'demo', function (err) {
+            connection.insert({lala: 1, test2: 'demo'}, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();
@@ -209,7 +209,7 @@ describe('Connection', function () {
                 callback(null, {insertId: 23543});
             });
 
-            connection.insertObject(object, 'demo', function (err, result) {
+            connection.insert(object, 'demo', function (err, result) {
                 assert.isNull(err);
 
                 object.id = 23543;
@@ -228,7 +228,7 @@ describe('Connection', function () {
 
     });
 
-    describe('#updateObject', function () {
+    describe('#update', function () {
 
         it('Should compose correct SQL', function (done) {
             sinon.stub(Connection.prototype, 'query', function (sql, callback) {
@@ -237,7 +237,7 @@ describe('Connection', function () {
                 callback(null);
             });
 
-            connection.updateObject({id: 1},  {lala: 1}, 'demo', function (err) {
+            connection.update({id: 1},  {lala: 1}, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();

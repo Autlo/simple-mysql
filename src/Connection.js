@@ -93,7 +93,7 @@ Connection.prototype.findOneBy = function (criteria, table, callback)
  * @param {String} table
  * @param {Function} callback(err, object)
  */
-Connection.prototype.insertObject = function (object, table, callback)
+Connection.prototype.insert = function (object, table, callback)
 {
     this.query(qb.buildInsertQuery(object, table), function (err, result) {
         if (err) return callback(err, null);
@@ -110,7 +110,7 @@ Connection.prototype.insertObject = function (object, table, callback)
  * @param {String} table
  * @param {Function} callback(err)
  */
-Connection.prototype.updateObject = function (criteria, object, table, callback)
+Connection.prototype.update = function (criteria, object, table, callback)
 {
     this.query(qb.buildUpdateQuery(criteria, object, table), callback);
 };

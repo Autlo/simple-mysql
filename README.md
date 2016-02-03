@@ -15,8 +15,8 @@ Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common quer
   - [`findBy`](#findBy)
   - [`findAll`](#findAll)
   - [`findOneBy`](#findOneBy)
-  - [`insertObject`](#insertObject)
-  - [`updateObject`](#updateObject)
+  - [`insert`](#insert)
+  - [`update`](#update)
   - [`delete`](#delete)
   - [`deleteBy`](#deleteBy)
   - [`query`](#query)
@@ -167,13 +167,13 @@ connection.find(23, function (err, object) {
 
 ---
 
-### insertObject(object, table, callback)
+### insert(object, table, callback)
 
 TODO
 
 ---
 
-### updateObject(criteria, object, table, callback)
+### update(criteria, object, table, callback)
 
 TODO
 
