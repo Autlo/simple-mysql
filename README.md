@@ -73,7 +73,6 @@ var mysql = require('simple-mysql');
 connection.closeConnection('default');
 ```
 
-
 #### Connection to multiple databases
 
 TODO
@@ -104,7 +103,7 @@ connection.find(23, function (err, object) {
 
 ### findBy(criteria, orderBy, table, callback)
 
-Finds rows from database where key is equal to value from `table`. Uses AND condition with multiple criteria 
+Finds rows from database where key is equal to value from `table`. Uses AND condition with multiple criteria. 
 
 **Arguments**
 
@@ -117,7 +116,7 @@ Finds rows from database where key is equal to value from `table`. Uses AND cond
 
 ```js
 // assuming connections is a Connection object and connected to database
-connection.findBy({name: 'John', age: 23}, {age: 'DESC'}, function (err, rows) {
+connection.findBy({name: 'John'}, {age: 'DESC'}, 'user', function (err, rows) {
     // err is equal to error from database if there were any
     // rows is an array of objects equal to the row from database or an 
     // empty row when there where no results
@@ -126,15 +125,48 @@ connection.findBy({name: 'John', age: 23}, {age: 'DESC'}, function (err, rows) {
 
 ---
 
-### findAll(criteria, orderBy, table, callback)
+### findAll(orderBy, table, callback)
 
-TODO
+Finds all rows from given `table`, ordered by `orderBy` if present 
+
+**Arguments**
+
+* `orderBy` - Key-value pairs for order by condition.
+* `table` - Name of table in database.
+* `callback(err, rows)` - A callback which is called when database query finishes.
+
+**Examples**
+
+```js
+// assuming connections is a Connection object and connected to database
+connection.findAll({age: 'DESC'}, 'user', function (err, rows) {
+    // err is equal to error from database if there were any
+    // rows is an array of objects equal to the rows from database or an 
+    // empty array when there where no results
+});
+```
 
 ---
 
 ### findOneBy(criteria, orderBy, table, callback)
 
-TODO
+Finds row from database according to the `criteria` from `table`. Will throw an `Error`, when multiple rows are found.
+
+**Arguments**
+
+* `id` - ID of the row.
+* `table` - Name of table in database.
+* `callback(err, object)` - A callback which is called when database query finishes.
+
+**Examples**
+
+```js
+// assuming connections is a Connection object and connected to database
+connection.find(23, function (err, object) {
+    // err is equal to error from database if there were any
+    // object is equal to the row from database or null when row with id 23 was not found
+});
+```
 
 ---
 
