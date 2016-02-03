@@ -154,7 +154,7 @@ Finds row from database according to the `criteria` from `table`. Will throw an 
 
 **Arguments**
 
-* `id` - ID of the row.
+* `criteria` - Key-value pairs for where condition.
 * `table` - Name of table in database.
 * `callback(err, object)` - A callback which is called when database query finishes.
 
