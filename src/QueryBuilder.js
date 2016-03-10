@@ -175,9 +175,19 @@ module.exports.buildOrderByPart = function (orderBy)
 
 module.exports.stringifyArray = function (array)
 {
-    return array.map(function(value) {
-        return stringify(value);
-    });
+    var arrayString = '';
+
+    for (var i in array) {
+        if (!array.hasOwnProperty(i)) {
+            continue;
+        }
+
+        arrayString += this.sanitizeValue(array[i]);
+
+        if (i != array.length-1) arrayString += ', ';
+    }
+
+    return arrayString;
 };
 
 /**
