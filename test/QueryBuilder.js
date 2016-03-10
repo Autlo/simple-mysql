@@ -51,6 +51,13 @@ describe('QueryBuilder', function () {
             );
         });
 
+        it('Should use IN when criteria value is array', function () {
+            assert.equal(
+                qb.buildSelectQuery({field: 1, field2: [1, 'value', false]}, {}, 'table'),
+                'SELECT * FROM `table` WHERE `field` = 1 AND `field2` IN (1,"value",false)'
+            );
+        });
+
         it('Should add correct ORDER BY statement', function () {
             assert.equal(
                 qb.buildSelectQuery({}, {field: 'DESC'}, 'table'),

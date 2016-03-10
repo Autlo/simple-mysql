@@ -113,6 +113,8 @@ module.exports.buildWherePart = function (criteria)
                 sql += ' IS NULL';
             } else if (typeof value === 'number') {
                 sql += ' = ' + value;
+            } else if (value instanceof Array) {
+                sql += ' IN (' + this.stringifyArray(value) + ')';
             } else {
                 sql += ' LIKE ' + this.sanitizeValue(value);
             }
@@ -169,6 +171,13 @@ module.exports.buildOrderByPart = function (orderBy)
     }
 
     return sql;
+};
+
+module.exports.stringifyArray = function (array)
+{
+    return array.map(function(value) {
+        return stringify(value);
+    });
 };
 
 /**
