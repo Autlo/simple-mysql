@@ -51,6 +51,13 @@ describe('QueryBuilder', function () {
             );
         });
 
+        it('Should use IN when criteria value is array', function () {
+            assert.equal(
+                qb.buildSelectQuery({field: 1, field2: [1, 'value', false]}, {}, 'table'),
+                'SELECT * FROM `table` WHERE `field` = 1 AND `field2` IN (1, \'value\', false)'
+            );
+        });
+
         it('Should add correct ORDER BY statement', function () {
             assert.equal(
                 qb.buildSelectQuery({}, {field: 'DESC'}, 'table'),
@@ -178,6 +185,16 @@ describe('QueryBuilder', function () {
             var field = 'table_name';
 
             assert.equal(qb.escapeField(field), '`table_name`');
+        });
+
+    });
+
+    describe('#stringifyArray', function () {
+
+        it('Should stringify array', function () {
+            var array = [0, '0', false, null, [], {}];
+
+            assert.equal(qb.stringifyArray(array), '0, \'0\', false, NULL, \'[]\', \'{}\'');
         });
 
     });
