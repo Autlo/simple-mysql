@@ -232,6 +232,56 @@ describe('Connection', function () {
 
     });
 
+    describe('#count', function () {
+
+        it('Should compose correct SQL', function (done) {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SELECT COUNT(*) AS count FROM `demo`');
+
+                callback(null, [{count: 5}]);
+            });
+
+            connection.count('demo', function (err, count) {
+                assert.isNull(err);
+                assert.equal(count, 5);
+
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            Connection.prototype.query.restore();
+
+            done();
+        });
+
+    });
+
+    describe('#countBy', function () {
+
+        it('Should compose correct SQL', function (done) {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SELECT COUNT(*) AS count FROM `demo` WHERE `demo_field` LIKE \'test\'');
+
+                callback(null, [{count: 15}]);
+            });
+
+            connection.countBy({demo_field: 'test'}, 'demo', function (err, count) {
+                assert.isNull(err);
+                assert.equal(count, 15);
+
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            Connection.prototype.query.restore();
+
+            done();
+        });
+
+    });
+
     describe('#insert', function () {
 
         it('Should compose correct SQL', function (done) {

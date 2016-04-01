@@ -25,6 +25,20 @@ module.exports.buildSelectQuery = function (criteria, orderBy, limit, offset, ta
 };
 
 /**
+ * @param {Object} criteria
+ * @param {String} table
+ * @returns {String}
+ */
+module.exports.buildCountQuery = function (criteria, table)
+{
+    return util.format(
+        'SELECT COUNT(*) AS count FROM %s%s',
+        this.escapeField(table),
+        this.buildWherePart(criteria)
+    );
+};
+
+/**
  * @param {Object} object
  * @param {String} table
  * @returns {String}

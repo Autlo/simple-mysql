@@ -65,7 +65,7 @@ Connection.prototype.find = function (id, table, callback)
  */
 Connection.prototype.findBy = function (criteria, orderBy, table, callback)
 {
-    this.query(qb.buildSelectQuery(criteria, orderBy, null, null, table), callback);
+    this.findByPaginated(criteria, orderBy, null, null, table, callback);
 };
 
 /**
@@ -88,7 +88,7 @@ Connection.prototype.findByPaginated = function (criteria, orderBy, limit, offse
  */
 Connection.prototype.findAll = function (orderBy, table, callback)
 {
-    this.query(qb.buildSelectQuery({}, orderBy, null, null, table), callback);
+    this.findAllPaginated(orderBy, null, null, table, callback);
 };
 
 /**
@@ -111,6 +111,29 @@ Connection.prototype.findAllPaginated = function (orderBy, limit, offset, table,
 Connection.prototype.findOneBy = function (criteria, table, callback)
 {
     this.query(qb.buildSelectQuery(criteria, {}, null, null, table), returnOneOrNull(callback));
+};
+
+/**
+ * @param {String} table
+ * @param {Function} callback(err, count)
+ */
+Connection.prototype.count = function (table, callback)
+{
+    this.countBy({}, table, callback);
+};
+
+/**
+ * @param {Object} criteria
+ * @param {String} table
+ * @param {Function} callback(err, count)
+ */
+Connection.prototype.countBy = function (criteria, table, callback)
+{
+    this.query(qb.buildCountQuery(criteria, table), function (err, rows) {
+        if (err) return callback(err);
+
+        callback(null, rows[0].count);
+    });
 };
 
 /**

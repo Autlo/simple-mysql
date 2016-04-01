@@ -94,6 +94,17 @@ describe('QueryBuilder', function () {
 
     });
 
+    describe('#buildCountQuery', function () {
+
+        it('Should build query with COUNT(*)', function () {
+            assert.equal(
+                qb.buildCountQuery({}, 'test'),
+                'SELECT COUNT(*) AS count FROM `test`'
+            );
+        });
+
+    });
+
     describe('#buildInsertQuery', function () {
 
         it('Should return correct query with single field and value pair', function () {
