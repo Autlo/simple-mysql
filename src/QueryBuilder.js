@@ -101,9 +101,7 @@ module.exports.buildWherePart = function (criteria)
         sql += ' WHERE ';
 
         for (var key in criteria) {
-            if (!criteria.hasOwnProperty(key)) {
-                continue;
-            }
+            if (!criteria.hasOwnProperty(key)) continue;
 
             if (n !== 0) {
                 sql += ' AND ';
@@ -163,9 +161,7 @@ module.exports.buildOrderByPart = function (orderBy)
         sql += ' ORDER BY ';
 
         for (var field in orderBy) {
-            if (!orderBy.hasOwnProperty(field)) {
-                continue;
-            }
+            if (!orderBy.hasOwnProperty(field)) continue;
 
             if (i !== 0) {
                 sql += ', ';
@@ -205,9 +201,7 @@ module.exports.stringifyArray = function (array)
     var arrayString = '';
 
     for (var i in array) {
-        if (!array.hasOwnProperty(i)) {
-            continue;
-        }
+        if (!array.hasOwnProperty(i)) continue;
 
         arrayString += this.sanitizeValue(array[i]);
 
