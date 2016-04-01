@@ -136,6 +136,30 @@ describe('Connection', function () {
 
     });
 
+    describe('#findByPaginated', function () {
+
+        it('Should compose correct SQL', function (done) {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SELECT * FROM `demo` WHERE `demo_field` LIKE \'test\' ORDER BY `field` DESC LIMIT 100 OFFSET 200');
+
+                callback(null, []);
+            });
+
+            connection.findByPaginated({demo_field: 'test'}, {field: 'desc'}, 100, 200, 'demo', function (err) {
+                assert.isNull(err);
+
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            Connection.prototype.query.restore();
+
+            done();
+        });
+
+    });
+
     describe('#findAll', function () {
 
         it('Should compose correct SQL', function (done) {
@@ -146,6 +170,30 @@ describe('Connection', function () {
             });
 
             connection.findAll({field: 'asc'}, 'demo', function (err) {
+                assert.isNull(err);
+
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            Connection.prototype.query.restore();
+
+            done();
+        });
+
+    });
+
+    describe('#findAllPaginated', function () {
+
+        it('Should compose correct SQL', function (done) {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SELECT * FROM `demo` ORDER BY `field` ASC LIMIT 100 OFFSET 200');
+
+                callback(null, []);
+            });
+
+            connection.findAllPaginated({field: 'asc'}, 100, 200, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();

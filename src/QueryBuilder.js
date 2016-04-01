@@ -8,16 +8,19 @@ var dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 /**
  * @param {Object} criteria
  * @param {Object} orderBy
+ * @param {Number} limit
+ * @param {Number} offset
  * @param {String} table
  * @returns {String}
  */
-module.exports.buildSelectQuery = function (criteria, orderBy, table)
+module.exports.buildSelectQuery = function (criteria, orderBy, limit, offset, table)
 {
     return util.format(
-        'SELECT * FROM %s%s%s',
+        'SELECT * FROM %s%s%s%s',
         this.escapeField(table),
         this.buildWherePart(criteria),
-        this.buildOrderByPart(orderBy)
+        this.buildOrderByPart(orderBy),
+        this.buildPaginationPart(limit, offset)
     );
 };
 
@@ -127,6 +130,26 @@ module.exports.buildWherePart = function (criteria)
 };
 
 /**
+ *
+ * @param {Number} limit
+ * @param {Number} offset
+ * @returns {String}
+ */
+module.exports.buildPaginationPart = function (limit, offset)
+{
+    var sql = '';
+
+    if (limit !== null && offset !== null) {
+        limit = Number(limit);
+        offset = Number(offset);
+
+        sql += ' LIMIT ' + limit + ' OFFSET ' + offset;
+    }
+
+    return sql;
+};
+
+/**
  * @param {Object} orderBy
  * @returns {String}
  */
@@ -173,6 +196,10 @@ module.exports.buildOrderByPart = function (orderBy)
     return sql;
 };
 
+/**
+ * @param {Array} array
+ * @returns {String}
+ */
 module.exports.stringifyArray = function (array)
 {
     var arrayString = '';
@@ -184,7 +211,7 @@ module.exports.stringifyArray = function (array)
 
         arrayString += this.sanitizeValue(array[i]);
 
-        if (i != array.length-1) arrayString += ', ';
+        if (i != array.length - 1) arrayString += ', ';
     }
 
     return arrayString;

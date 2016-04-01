@@ -65,7 +65,20 @@ Connection.prototype.find = function (id, table, callback)
  */
 Connection.prototype.findBy = function (criteria, orderBy, table, callback)
 {
-    this.query(qb.buildSelectQuery(criteria, orderBy, table), callback);
+    this.query(qb.buildSelectQuery(criteria, orderBy, null, null, table), callback);
+};
+
+/**
+ * @param {Object} criteria
+ * @param {Object} orderBy
+ * @param {String} table
+ * @param {Number} limit
+ * @param {Number} offset
+ * @param {Function} callback(err, object)
+ */
+Connection.prototype.findByPaginated = function (criteria, orderBy, limit, offset, table, callback)
+{
+    this.query(qb.buildSelectQuery(criteria, orderBy, limit, offset, table), callback);
 };
 
 /**
@@ -75,7 +88,19 @@ Connection.prototype.findBy = function (criteria, orderBy, table, callback)
  */
 Connection.prototype.findAll = function (orderBy, table, callback)
 {
-    this.query(qb.buildSelectQuery({}, orderBy, table), callback);
+    this.query(qb.buildSelectQuery({}, orderBy, null, null, table), callback);
+};
+
+/**
+ * @param {Object} orderBy
+ * @param {Number} limit
+ * @param {Number} offset
+ * @param {String} table
+ * @param {Function} callback
+ */
+Connection.prototype.findAllPaginated = function (orderBy, limit, offset, table, callback)
+{
+    this.query(qb.buildSelectQuery({}, orderBy, limit, offset, table), callback);
 };
 
 /**
@@ -85,7 +110,7 @@ Connection.prototype.findAll = function (orderBy, table, callback)
  */
 Connection.prototype.findOneBy = function (criteria, table, callback)
 {
-    this.query(qb.buildSelectQuery(criteria, {}, table), returnOneOrNull(callback));
+    this.query(qb.buildSelectQuery(criteria, {}, null, null, table), returnOneOrNull(callback));
 };
 
 /**
