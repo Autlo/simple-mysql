@@ -12,8 +12,8 @@ Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common quer
   - [Connection to multiple databases](#connection-to-multiple-databases)
 - [Provided Functions](#provided-functions)
   - [`find`](#find)
-  - [`findBy`](#findBy)
   - [`findAll`](#findAll)
+  - [`findBy`](#findBy)
   - [`findOneBy`](#findOneBy)
   - [`insert`](#insert)
   - [`update`](#update)
@@ -84,7 +84,7 @@ Finds row from database with the field id equal to `id` from `table`.
 
 * `id` - ID of the row.
 * `table` - Name of table in database.
-* `callback(err, object)` - A callback which is called when database query finishes.
+* `callback(err, object)` - Callback which is called when database query finishes.
 
 **Examples**
 
@@ -98,30 +98,6 @@ connection.find(23, function (err, object) {
 
 ---
 
-### findBy(criteria, orderBy, table, callback)
-
-Finds rows from database where key is equal to value from `table`. Uses AND condition with multiple criteria. 
-
-**Arguments**
-
-* `criteria` - Key-value pairs for where condition.
-* `orderBy` - Key-value pairs for order by condition.
-* `table` - Name of table in database.
-* `callback(err, object)` - A callback which is called when database query finishes.
-
-**Examples**
-
-```js
-// assuming connections is a Connection object and connected to database
-connection.findBy({name: 'John'}, {age: 'DESC'}, 'user', function (err, rows) {
-    // err is equal to error from database if there were any
-    // rows is an array of objects equal to the row from database or an 
-    // empty row when there where no results
-});
-```
-
----
-
 ### findAll(orderBy, table, callback)
 
 Finds all rows from given `table`, ordered by `orderBy` if present 
@@ -130,7 +106,7 @@ Finds all rows from given `table`, ordered by `orderBy` if present
 
 * `orderBy` - Key-value pairs for order by condition.
 * `table` - Name of table in database.
-* `callback(err, rows)` - A callback which is called when database query finishes.
+* `callback(err, rows)` - Callback which is called when database query finishes.
 
 **Examples**
 
@@ -145,6 +121,30 @@ connection.findAll({age: 'DESC'}, 'user', function (err, rows) {
 
 ---
 
+### findBy(criteria, orderBy, table, callback)
+
+Finds rows from database where key is equal to value from `table`. Uses AND condition with multiple criteria. 
+
+**Arguments**
+
+* `criteria` - Key-value pairs for where condition.
+* `orderBy` - Key-value pairs for order by condition.
+* `table` - Name of table in database.
+* `callback(err, rows)` - Callback which is called when database query finishes.
+
+**Examples**
+
+```js
+// assuming connection is a Connection object and connected to database
+connection.findBy({name: 'John'}, {age: 'DESC'}, 'user', function (err, rows) {
+    // err is equal to error from database if there were any
+    // rows is an array of objects equal to the row from database or an 
+    // empty array when there where no results
+});
+```
+
+---
+
 ### findOneBy(criteria, orderBy, table, callback)
 
 Finds row from database according to the `criteria` from `table`. Will throw an `Error`, when multiple rows are found.
@@ -153,7 +153,7 @@ Finds row from database according to the `criteria` from `table`. Will throw an 
 
 * `criteria` - Key-value pairs for where condition.
 * `table` - Name of table in database.
-* `callback(err, object)` - A callback which is called when database query finishes.
+* `callback(err, object)` - Callback which is called when database query finishes.
 
 **Examples**
 
