@@ -143,6 +143,8 @@ Connection.prototype.query = function (sql, callback)
 {
     var self = this;
 
+    debug('[%s] - %s', this.name, sql);
+
     this.pool.query(sql, function (err, result) {
         if (err) self._onError(err);
 
@@ -156,7 +158,7 @@ Connection.prototype.query = function (sql, callback)
  */
 Connection.prototype._onConnection = function (connection)
 {
-    debug('Connection connected as id %s.', connection.threadId);
+    debug('[%s] - Connection connected as id %s.', this.name, connection.threadId);
 
     connection.query('SET time_zone = "+00:00";', function (err) {
         if (err) throw err;
