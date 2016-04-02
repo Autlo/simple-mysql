@@ -17,6 +17,8 @@ Wrapper for [mysql](https://www.npmjs.com/package/mysql) to simplify common quer
   - [`findBy`](#findbycriteria-orderby-table-callback)
   - [`findByPaginated`](#findbypaginatedcriteria-orderby-limit-offset-table-callback)
   - [`findOneBy`](#findonebycriteria-orderby-table-callback)
+  - [`count`](#counttable-callback)
+  - [`countBy`](#countcriteria-table-callback)
   - [`insert`](#insertobject-table-callback)
   - [`update`](#updatecriteria-object-table-callback)
   - [`delete`](#deleteid-table-object)
@@ -215,6 +217,49 @@ Finds row from database according to the `criteria` from `table`. Will throw an 
 connection.find(23, function (err, object) {
     // err is equal to error from database if there were any
     // object is equal to the row from database or null when row with id 23 was not found
+});
+```
+
+---
+
+### count(table, callback)
+
+Count all rows in`table`.
+
+**Arguments**
+
+* `table` - Name of table in database.
+* `callback(err, count)` - Callback which is called when database query finishes.
+
+**Examples**
+
+```js
+// assuming connections is a Connection object and connected to database
+connection.count('table', function (err, count) {
+    // err is equal to error from database if there were any
+    // count is an integer
+});
+```
+
+---
+
+### countBy(table, callback)
+
+Count all rows according to `criteria` in `table`.
+
+**Arguments**
+
+* `criteria` - Key-value pairs for where condition.
+* `table` - Name of table in database.
+* `callback(err, count)` - Callback which is called when database query finishes.
+
+**Examples**
+
+```js
+// assuming connections is a Connection object and connected to database
+connection.count({name: 'John'}, 'table', function (err, count) {
+    // err is equal to error from database if there were any
+    // count is an integer
 });
 ```
 
