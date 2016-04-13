@@ -136,6 +136,30 @@ describe('Connection', function () {
 
     });
 
+    describe('#findByPaginated', function () {
+
+        it('Should compose correct SQL', function (done) {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SELECT * FROM `demo` WHERE `demo_field` LIKE \'test\' ORDER BY `field` DESC LIMIT 100 OFFSET 200');
+
+                callback(null, []);
+            });
+
+            connection.findByPaginated({demo_field: 'test'}, {field: 'desc'}, 100, 200, 'demo', function (err) {
+                assert.isNull(err);
+
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            Connection.prototype.query.restore();
+
+            done();
+        });
+
+    });
+
     describe('#findAll', function () {
 
         it('Should compose correct SQL', function (done) {
@@ -146,6 +170,30 @@ describe('Connection', function () {
             });
 
             connection.findAll({field: 'asc'}, 'demo', function (err) {
+                assert.isNull(err);
+
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            Connection.prototype.query.restore();
+
+            done();
+        });
+
+    });
+
+    describe('#findAllPaginated', function () {
+
+        it('Should compose correct SQL', function (done) {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SELECT * FROM `demo` ORDER BY `field` ASC LIMIT 100 OFFSET 200');
+
+                callback(null, []);
+            });
+
+            connection.findAllPaginated({field: 'asc'}, 100, 200, 'demo', function (err) {
                 assert.isNull(err);
 
                 done();
@@ -171,6 +219,56 @@ describe('Connection', function () {
 
             connection.findOneBy({demo_field: 'test'}, 'demo', function (err) {
                 assert.isNull(err);
+
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            Connection.prototype.query.restore();
+
+            done();
+        });
+
+    });
+
+    describe('#count', function () {
+
+        it('Should compose correct SQL', function (done) {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SELECT COUNT(*) AS count FROM `demo`');
+
+                callback(null, [{count: 5}]);
+            });
+
+            connection.count('demo', function (err, count) {
+                assert.isNull(err);
+                assert.equal(count, 5);
+
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            Connection.prototype.query.restore();
+
+            done();
+        });
+
+    });
+
+    describe('#countBy', function () {
+
+        it('Should compose correct SQL', function (done) {
+            sinon.stub(Connection.prototype, 'query', function (sql, callback) {
+                assert.equal(sql, 'SELECT COUNT(*) AS count FROM `demo` WHERE `demo_field` LIKE \'test\'');
+
+                callback(null, [{count: 15}]);
+            });
+
+            connection.countBy({demo_field: 'test'}, 'demo', function (err, count) {
+                assert.isNull(err);
+                assert.equal(count, 15);
 
                 done();
             });

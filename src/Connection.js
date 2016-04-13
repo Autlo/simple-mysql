@@ -65,7 +65,20 @@ Connection.prototype.find = function (id, table, callback)
  */
 Connection.prototype.findBy = function (criteria, orderBy, table, callback)
 {
-    this.query(qb.buildSelectQuery(criteria, orderBy, table), callback);
+    this.findByPaginated(criteria, orderBy, null, null, table, callback);
+};
+
+/**
+ * @param {Object} criteria
+ * @param {Object} orderBy
+ * @param {String} table
+ * @param {Number} limit
+ * @param {Number} offset
+ * @param {Function} callback(err, object)
+ */
+Connection.prototype.findByPaginated = function (criteria, orderBy, limit, offset, table, callback)
+{
+    this.query(qb.buildSelectQuery(criteria, orderBy, limit, offset, table), callback);
 };
 
 /**
@@ -75,7 +88,19 @@ Connection.prototype.findBy = function (criteria, orderBy, table, callback)
  */
 Connection.prototype.findAll = function (orderBy, table, callback)
 {
-    this.query(qb.buildSelectQuery({}, orderBy, table), callback);
+    this.findAllPaginated(orderBy, null, null, table, callback);
+};
+
+/**
+ * @param {Object} orderBy
+ * @param {Number} limit
+ * @param {Number} offset
+ * @param {String} table
+ * @param {Function} callback
+ */
+Connection.prototype.findAllPaginated = function (orderBy, limit, offset, table, callback)
+{
+    this.query(qb.buildSelectQuery({}, orderBy, limit, offset, table), callback);
 };
 
 /**
@@ -85,7 +110,30 @@ Connection.prototype.findAll = function (orderBy, table, callback)
  */
 Connection.prototype.findOneBy = function (criteria, table, callback)
 {
-    this.query(qb.buildSelectQuery(criteria, {}, table), returnOneOrNull(callback));
+    this.query(qb.buildSelectQuery(criteria, {}, null, null, table), returnOneOrNull(callback));
+};
+
+/**
+ * @param {String} table
+ * @param {Function} callback(err, count)
+ */
+Connection.prototype.count = function (table, callback)
+{
+    this.countBy({}, table, callback);
+};
+
+/**
+ * @param {Object} criteria
+ * @param {String} table
+ * @param {Function} callback(err, count)
+ */
+Connection.prototype.countBy = function (criteria, table, callback)
+{
+    this.query(qb.buildCountQuery(criteria, table), function (err, rows) {
+        if (err) return callback(err);
+
+        callback(null, rows[0].count);
+    });
 };
 
 /**
@@ -143,6 +191,8 @@ Connection.prototype.query = function (sql, callback)
 {
     var self = this;
 
+    debug('[%s] - %s', this.name, sql);
+
     this.pool.query(sql, function (err, result) {
         if (err) self._onError(err);
 
@@ -156,7 +206,7 @@ Connection.prototype.query = function (sql, callback)
  */
 Connection.prototype._onConnection = function (connection)
 {
-    debug('Connection connected as id %s.', connection.threadId);
+    debug('[%s] - Connection connected as id %s.', this.name, connection.threadId);
 
     connection.query('SET time_zone = "+00:00";', function (err) {
         if (err) throw err;

@@ -11,56 +11,63 @@ describe('QueryBuilder', function () {
 
         it('Should return SELECT statement without WHERE condition when criteria is empty', function () {
             assert.equal(
-                qb.buildSelectQuery({}, {}, 'table'),
+                qb.buildSelectQuery({}, {}, null, null, 'table'),
                 'SELECT * FROM `table`'
+            );
+        });
+
+        it('Should return SELECT statement with LIMIT and OFFSET', function () {
+            assert.equal(
+                qb.buildSelectQuery({}, {}, 100, 200, 'table'),
+                'SELECT * FROM `table` LIMIT 100 OFFSET 200'
             );
         });
 
         it('Should use correct comparison with string', function () {
             assert.equal(
-                qb.buildSelectQuery({field: 'value'}, {}, 'table'),
+                qb.buildSelectQuery({field: 'value'}, {}, null, null, 'table'),
                 'SELECT * FROM `table` WHERE `field` LIKE \'value\''
             );
         });
 
         it('Should use correct comparison with integer', function () {
             assert.equal(
-                qb.buildSelectQuery({field: 1}, {}, 'table'),
+                qb.buildSelectQuery({field: 1}, {}, null, null, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 1'
             );
         });
 
         it('Should use correct comparison with floating point number', function () {
             assert.equal(
-                qb.buildSelectQuery({field: 4.3}, {}, 'table'),
+                qb.buildSelectQuery({field: 4.3}, {}, null, null, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 4.3'
             );
         });
 
         it('Should build correct SQL with multiple criteria', function () {
             assert.equal(
-                qb.buildSelectQuery({field: 4.3, field2: 'demo', field3: 'field'}, {}, 'table'),
+                qb.buildSelectQuery({field: 4.3, field2: 'demo', field3: 'field'}, {}, null, null, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 4.3 AND `field2` LIKE \'demo\' AND `field3` LIKE \'field\''
             );
         });
 
         it('Should use IS NULL when criteria value is null', function () {
             assert.equal(
-                qb.buildSelectQuery({field: 1, field2: null}, {}, 'table'),
+                qb.buildSelectQuery({field: 1, field2: null}, {}, null, null, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 1 AND `field2` IS NULL'
             );
         });
 
         it('Should use IN when criteria value is array', function () {
             assert.equal(
-                qb.buildSelectQuery({field: 1, field2: [1, 'value', false]}, {}, 'table'),
+                qb.buildSelectQuery({field: 1, field2: [1, 'value', false]}, {}, null, null, 'table'),
                 'SELECT * FROM `table` WHERE `field` = 1 AND `field2` IN (1, \'value\', false)'
             );
         });
 
         it('Should add correct ORDER BY statement', function () {
             assert.equal(
-                qb.buildSelectQuery({}, {field: 'DESC'}, 'table'),
+                qb.buildSelectQuery({}, {field: 'DESC'}, null, null, 'table'),
                 'SELECT * FROM `table` ORDER BY `field` DESC'
             );
         });
@@ -74,22 +81,33 @@ describe('QueryBuilder', function () {
 
         it('Should add multiple ORDER BY statements', function () {
             assert.equal(
-                qb.buildSelectQuery({}, {field: 'DESC', field2: 'ASC'}, 'table'),
+                qb.buildSelectQuery({}, {field: 'DESC', field2: 'ASC'}, null, null, 'table'),
                 'SELECT * FROM `table` ORDER BY `field` DESC, `field2` ASC'
             );
         });
 
         it('Should accept lowercase order', function () {
             assert.equal(
-                qb.buildSelectQuery({}, {field: 'desc', field2: 'asc'}, 'table'),
+                qb.buildSelectQuery({}, {field: 'desc', field2: 'asc'}, null, null, 'table'),
                 'SELECT * FROM `table` ORDER BY `field` DESC, `field2` ASC'
             );
         });
 
         it('Should throw error if invalid order is provided', function () {
             assert.throws(function () {
-                qb.buildSelectQuery({}, {field: 'order'}, 'table')
+                qb.buildSelectQuery({}, {field: 'order'}, null, null, 'table')
             }, Error);
+        });
+
+    });
+
+    describe('#buildCountQuery', function () {
+
+        it('Should build query with COUNT(*)', function () {
+            assert.equal(
+                qb.buildCountQuery({}, 'test'),
+                'SELECT COUNT(*) AS count FROM `test`'
+            );
         });
 
     });
