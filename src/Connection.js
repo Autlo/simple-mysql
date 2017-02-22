@@ -233,6 +233,7 @@ Connection.prototype._onError = function (err)
         case 'ER_DUP_ENTRY':
         case 'ER_BAD_NULL_ERROR':
         case 'ER_ROW_IS_REFERENCED_2':
+        case 'ER_NO_REFERENCED_ROW_2':
             break;
         default:
             throw err;
