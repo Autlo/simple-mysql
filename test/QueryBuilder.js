@@ -72,6 +72,13 @@ describe('QueryBuilder', function () {
             );
         });
 
+        it('Should add correct ORDER BY statement with minus sign', function () {
+            assert.equal(
+                qb.buildSelectQuery({}, {'-field': 'DESC'}, 'table'),
+                'SELECT * FROM `table` ORDER BY -`field` DESC'
+            );
+        });
+
         it('Should add multiple ORDER BY statements', function () {
             assert.equal(
                 qb.buildSelectQuery({}, {field: 'DESC', field2: 'ASC'}, null, null, 'table'),

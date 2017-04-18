@@ -181,7 +181,11 @@ module.exports.buildOrderByPart = function (orderBy)
                 sql += ', ';
             }
 
-            sql += this.escapeField(field);
+            if (field.charAt(0) === '-') {
+                sql += '-' + this.escapeField(field.slice(1));
+            } else {
+                sql += this.escapeField(field);
+            }
 
             var order = orderBy[field];
             var orderAdded = false;
